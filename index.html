@@ -139,38 +139,33 @@
         let points = parseInt(localStorage.getItem('zefoy_points') || '0');
         let services = {};
         
-        document.getElementById('points').textContent = points;
-        
-        // Check if returning from Gumroad
-        const urlParams = new URLSearchParams(window.location.search);
-        const gumroadSuccess = urlParams.get('gumroad_success');
-        const productId = urlParams.get('product_id');
-        
-        if (gumroadSuccess && productId) {
-            // Extract points from product_id
-            const match = productId.match(/points-(\d+)/);
-            if (match) {
-                const packageId = parseInt(match[1]);
-                const pointsMap = {
-                    1: 100,
-                    2: 1000,
-                    3: 5000,
-                    4: 10000,
-                    5: 25000
-                };
-                
-                const earnedPoints = pointsMap[packageId];
-                if (earnedPoints) {
+        // Gumroad から戻ってきたか確認
+        function checkGumroadReturn() {
+            const params = new URLSearchParams(window.location.search);
+            const earned = params.get('earned');
+            
+            if (earned) {
+                const earnedPoints = parseInt(earned);
+                if (earnedPoints > 0) {
                     points += earnedPoints;
                     localStorage.setItem('zefoy_points', points);
                     document.getElementById('points').textContent = points;
-                    alert(`✓ ${earnedPoints} points added to your account!`);
                     
-                    // Clean URL
+                    setTimeout(() => {
+                        alert(`✓ ${earnedPoints} points added to your account!`);
+                    }, 500);
+                    
+                    console.log(`Added ${earnedPoints} points`);
+                    
+                    // URL をクリーン
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
             }
         }
+        
+        checkGumroadReturn();
+        
+        document.getElementById('points').textContent = points;
         
         fetch('/api/services').then(r => r.json()).then(data => {
             services = data;
@@ -196,7 +191,7 @@
                     card.innerHTML = `
                         <div class="card-title">${svc.name}</div>
                         <div class="card-price">$${svc.price.toFixed(4)}</div>
-                        <input type="number" class="qty-input" min="10" max="${svc.limit}" value="100" id="qty-${p}-${key}">
+                        <input type="number" class="qty-input" min="10" max="1000" value="100" id="qty-${p}-${key}">
                         <input type="text" class="url-input-card" id="url-${p}-${key}" placeholder="URL">
                         <div class="points-info">Points: <span id="cost-${p}-${key}">-</span></div>
                         <button class="btn" onclick="purchase('${p}', '${key}')">Buy</button>
@@ -210,14 +205,14 @@
             const grid = document.getElementById('pkgGrid');
             grid.innerHTML = '';
             
-            const baseUrl = window.location.origin + window.location.pathname;
+            const currentUrl = window.location.origin + window.location.pathname;
             
             const gumroadUrls = {
-                1: `https://robachan.gumroad.com/l/100-point-1?redirect_url=${encodeURIComponent(baseUrl + '?gumroad_success=1&product_id=points-1')}`,
-                2: `https://robachan.gumroad.com/l/1000-points-10?redirect_url=${encodeURIComponent(baseUrl + '?gumroad_success=1&product_id=points-2')}`,
-                3: `https://robachan.gumroad.com/l/5000-points-45?redirect_url=${encodeURIComponent(baseUrl + '?gumroad_success=1&product_id=points-3')}`,
-                4: `https://robachan.gumroad.com/l/10000-points-85?redirect_url=${encodeURIComponent(baseUrl + '?gumroad_success=1&product_id=points-4')}`,
-                5: `https://robachan.gumroad.com/l/25000-points-200?redirect_url=${encodeURIComponent(baseUrl + '?gumroad_success=1&product_id=points-5')}`
+                1: `https://robachan.gumroad.com/l/100-point-1?redirect_url=${encodeURIComponent(currentUrl + '?earned=100')}`,
+                2: `https://robachan.gumroad.com/l/1000-points-10?redirect_url=${encodeURIComponent(currentUrl + '?earned=1000')}`,
+                3: `https://robachan.gumroad.com/l/5000-points-45?redirect_url=${encodeURIComponent(currentUrl + '?earned=5000')}`,
+                4: `https://robachan.gumroad.com/l/10000-points-85?redirect_url=${encodeURIComponent(currentUrl + '?earned=10000')}`,
+                5: `https://robachan.gumroad.com/l/25000-points-200?redirect_url=${encodeURIComponent(currentUrl + '?earned=25000')}`
             };
             
             for (const pkg of packages) {
@@ -252,22 +247,18 @@
             document.getElementById('adModal').classList.add('active');
             startAdTimer();
             
-            // Load free follower ads
             setTimeout(() => {
-                // Banner Ad 2
                 const script1 = document.createElement('script');
                 script1.src = 'https://conscientiouscabbageadrift.com/f1/c3/bb/f1c3bb6c97918874b928466e660122f0.js';
                 script1.async = true;
                 document.body.appendChild(script1);
                 
-                // Native Ad
                 const script2 = document.createElement('script');
                 script2.async = true;
                 script2.setAttribute('data-cfasync', 'false');
                 script2.src = 'https://conscientiouscabbageadrift.com/c6875b62541e72769696c2d1e22bec2e/invoke.js';
                 document.body.appendChild(script2);
                 
-                // Add native ad container
                 const container = document.createElement('div');
                 container.id = 'container-c6875b62541e72769696c2d1e22bec2e';
                 document.body.appendChild(container);
@@ -314,7 +305,6 @@
             const url = document.getElementById(`url-${platform}-${service}`).value;
             const svc = services[platform]?.[service];
             
-            // Max 1000 validation
             if (qty > 1000) qty = 1000;
             
             if (!url) { alert('Enter URL'); return; }
@@ -340,14 +330,12 @@
             });
         }
 
-        // Update points cost display
         document.addEventListener('input', (e) => {
             if (e.target.className === 'qty-input') {
                 const [, p, k] = e.target.id.match(/qty-(\w+)-(\w+)/) || [];
                 let qty = parseInt(e.target.value) || 0;
                 const svc = services[p]?.[k];
                 
-                // Max 1000 limit
                 if (qty > 1000) {
                     qty = 1000;
                     e.target.value = 1000;
@@ -361,7 +349,6 @@
             }
         });
 
-        // Check free timer
         const lastFree = localStorage.getItem('lastFree');
         if (lastFree) {
             const elapsed = Date.now() - parseInt(lastFree);
