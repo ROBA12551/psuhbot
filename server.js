@@ -80,12 +80,14 @@ function getServiceId(platform, type) {
     return SERVICES[key];
 }
 
-// Validate URL
+// Validate URL - very lenient
 function validateUrl(url, platform) {
     if (platform === 'instagram') {
-        return /(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel|stories|[\w\.]+)/i.test(url);
+        // Accept any Instagram URL
+        return url.includes('instagram.com');
     } else {
-        return /(?:https?:\/\/)?(?:www\.)?tiktok\.com\/@[\w\.-]+/i.test(url);
+        // Accept any TikTok URL
+        return url.includes('tiktok.com');
     }
 }
 
@@ -108,26 +110,28 @@ app.post('/api/boost', async (req, res) => {
         const { platform, url, type, qty } = req.body;
         const clientId = req.headers['x-client-id'] || req.ip;
 
+        console.log('Request:', { platform, url, type, qty });
+
         // Validate input
         if (!platform || !url || !type || !qty) {
-            return res.status(400).json({ msg: 'Missing fields' });
+            return res.status(400).json({ msg: 'Missing fields', received: { platform, url, type, qty } });
         }
 
         if (!['instagram', 'tiktok'].includes(platform)) {
-            return res.status(400).json({ msg: 'Invalid platform' });
+            return res.status(400).json({ msg: 'Invalid platform', platform });
         }
 
         if (!['followers', 'likes', 'views', 'comments'].includes(type)) {
-            return res.status(400).json({ msg: 'Invalid type' });
+            return res.status(400).json({ msg: 'Invalid type', type });
         }
 
         if (qty < 1 || qty > 10000) {
-            return res.status(400).json({ msg: 'Quantity 1-10000' });
+            return res.status(400).json({ msg: 'Quantity 1-10000', qty });
         }
 
         // Validate URL
         if (!validateUrl(url, platform)) {
-            return res.status(400).json({ msg: 'Invalid URL format' });
+            return res.status(400).json({ msg: 'Invalid URL - must be Instagram or TikTok link', url });
         }
 
         // Check cooldown

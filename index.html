@@ -401,6 +401,8 @@
             const qty = parseInt(document.getElementById('qty').value);
             const submit = document.getElementById('submit');
 
+            console.log('Submit:', { platform, url, type, qty });
+
             if (!url || !type || !qty) {
                 showMsg('Fill all fields', 'error');
                 return;
@@ -427,7 +429,9 @@
                     document.getElementById('form').reset();
                     document.getElementById('qty').value = '10';
                 } else {
-                    showMsg('Error: ' + (data.msg || 'Failed'), 'error');
+                    const errorMsg = data.msg || data.error || 'Failed';
+                    console.error('API Error:', data);
+                    showMsg('❌ ' + errorMsg, 'error');
                 }
             } catch (err) {
                 showMsg('Connection error: ' + err.message, 'error');
@@ -437,9 +441,6 @@
         });
 
         render();
-    </script>
-</body>
-</html>
     </script>
 </body>
 </html>
