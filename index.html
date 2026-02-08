@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booster</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            margin-bottom: 35px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ff006e, #8338ec);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            margin-bottom: 30px;
+            background: #0f0f0f;
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .tab-btn {
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #ff006e;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #bbb;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 11px 14px;
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #ff006e;
+        }
+
+        input::placeholder {
+            color: #555;
+        }
+
+        .qty-box {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .qty-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #2a2a2a;
+            background: #0f0f0f;
+            color: #ff006e;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .qty-btn:hover {
+            border-color: #ff006e;
+            background: rgba(255, 0, 110, 0.1);
+        }
+
+        input[type="number"] {
+            text-align: center;
+            flex: 1;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 25px 0;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .feature {
+            padding: 8px;
+            background: #0f0f0f;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feature::before {
+            content: "✓";
+            color: #ff006e;
+            font-weight: bold;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #ff006e, #8338ec);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .msg {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .msg.success {
+            display: block;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .msg.error {
+            display: block;
+            background: rgba(255, 0, 110, 0.1);
+            color: #ff006e;
+            border: 1px solid rgba(255, 0, 110, 0.3);
+        }
+
+        .msg.loading {
+            display: block;
+            background: rgba(131, 56, 236, 0.1);
+            color: #8338ec;
+            border: 1px solid rgba(131, 56, 236, 0.3);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #8338ec;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 6px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .history {
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid #2a2a2a;
+        }
+
+        .history h3 {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .hist-item {
+            background: #0f0f0f;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: #999;
+            border-left: 3px solid #ff006e;
+        }
+
+        .hist-time {
+            color: #555;
+            font-size: 10px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 24px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚡ Booster</div>
+            <div class="subtitle">Instagram & TikTok Growth</div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="instagram">Instagram</button>
+            <button class="tab-btn" data-tab="tiktok">TikTok</button>
+        </div>
+
+        <form id="form">
+            <div class="form-group">
+                <label for="url">Post URL</label>
+                <input type="text" id="url" placeholder="https://instagram.com/p/..." required>
+            </div>
+
+            <div class="form-group">
+                <label for="type">Type</label>
+                <select id="type" required>
+                    <option value="followers">Followers</option>
+                    <option value="likes">Likes</option>
+                    <option value="views">Views</option>
+                    <option value="comments">Comments</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Quantity</label>
+                <div class="qty-box">
+                    <button type="button" class="qty-btn" id="dec">−</button>
+                    <input type="number" id="qty" min="1" max="10000" value="10" required>
+                    <button type="button" class="qty-btn" id="inc">+</button>
+                </div>
+            </div>
+
+            <div class="features">
+                <div class="feature">Free</div>
+                <div class="feature">Fast</div>
+                <div class="feature">Real</div>
+                <div class="feature">Safe</div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submit">Start Boost</button>
+            <div class="msg" id="msg"></div>
+        </form>
+
+        <div class="history">
+            <h3>Activity</h3>
+            <div id="hist"></div>
+        </div>
+    </div>
+
+    <script>
+        let platform = 'instagram';
+        const hist = JSON.parse(localStorage.getItem('hist') || '[]');
+
+        // Platform tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                platform = btn.dataset.tab;
+            });
+        });
+
+        // Quantity controls
+        document.getElementById('inc').addEventListener('click', e => {
+            e.preventDefault();
+            const input = document.getElementById('qty');
+            input.value = Math.min(parseInt(input.value) + 10, 10000);
+        });
+
+        document.getElementById('dec').addEventListener('click', e => {
+            e.preventDefault();
+            const input = document.getElementById('qty');
+            input.value = Math.max(parseInt(input.value) - 10, 1);
+        });
+
+        function showMsg(text, type) {
+            const msg = document.getElementById('msg');
+            msg.innerHTML = type === 'loading' ? `<span class="spinner"></span>${text}` : text;
+            msg.className = 'msg ' + type;
+        }
+
+        function addHist(url, type, qty) {
+            const item = { url: url.substring(0, 35) + '...', type, qty, time: new Date().toLocaleTimeString() };
+            hist.unshift(item);
+            if (hist.length > 5) hist.pop();
+            localStorage.setItem('hist', JSON.stringify(hist));
+            render();
+        }
+
+        function render() {
+            document.getElementById('hist').innerHTML = hist.slice(0, 5).map(h => `
+                <div class="hist-item">
+                    <strong>${platform}</strong> ${h.type} +${h.qty}<br>
+                    <span class="hist-time">${h.time}</span>
+                </div>
+            `).join('');
+        }
+
+        // Form submission
+        document.getElementById('form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const url = document.getElementById('url').value;
+            const type = document.getElementById('type').value;
+            const qty = parseInt(document.getElementById('qty').value);
+            const submit = document.getElementById('submit');
+
+            if (!url || !type || !qty) {
+                showMsg('Fill all fields', 'error');
+                return;
+            }
+
+            submit.disabled = true;
+            showMsg('Processing...', 'loading');
+
+            try {
+                // Get current protocol and host
+                const apiUrl = `${window.location.protocol}//${window.location.host}/api/boost`;
+                
+                const res = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ platform, url, type, qty })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    addHist(url, type, qty);
+                    showMsg('✓ Boost started! ID: ' + data.id, 'success');
+                    document.getElementById('form').reset();
+                    document.getElementById('qty').value = '10';
+                } else {
+                    showMsg('Error: ' + (data.msg || 'Failed'), 'error');
+                }
+            } catch (err) {
+                showMsg('Connection error: ' + err.message, 'error');
+            }
+
+            submit.disabled = false;
+        });
+
+        render();
+    </script>
+</body>
+</html>
