@@ -141,6 +141,37 @@
         
         document.getElementById('points').textContent = points;
         
+        // Check if returning from Gumroad
+        const urlParams = new URLSearchParams(window.location.search);
+        const gumroadSuccess = urlParams.get('gumroad_success');
+        const productId = urlParams.get('product_id');
+        
+        if (gumroadSuccess && productId) {
+            // Extract points from product_id
+            const match = productId.match(/points-(\d+)/);
+            if (match) {
+                const packageId = parseInt(match[1]);
+                const pointsMap = {
+                    1: 100,
+                    2: 1000,
+                    3: 5000,
+                    4: 10000,
+                    5: 25000
+                };
+                
+                const earnedPoints = pointsMap[packageId];
+                if (earnedPoints) {
+                    points += earnedPoints;
+                    localStorage.setItem('zefoy_points', points);
+                    document.getElementById('points').textContent = points;
+                    alert(`✓ ${earnedPoints} points added to your account!`);
+                    
+                    // Clean URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+        }
+        
         fetch('/api/services').then(r => r.json()).then(data => {
             services = data;
             renderServices();
@@ -179,12 +210,14 @@
             const grid = document.getElementById('pkgGrid');
             grid.innerHTML = '';
             
+            const baseUrl = window.location.origin + window.location.pathname;
+            
             const gumroadUrls = {
-                1: 'https://robachan.gumroad.com/l/100-point-1',
-                2: 'https://robachan.gumroad.com/l/1000-points-10',
-                3: 'https://robachan.gumroad.com/l/5000-points-45',
-                4: 'https://robachan.gumroad.com/l/10000-points-85',
-                5: 'https://robachan.gumroad.com/l/25000-points-200'
+                1: `https://robachan.gumroad.com/l/100-point-1?redirect_url=${encodeURIComponent(baseUrl + '?gumroad_success=1&product_id=points-1')}`,
+                2: `https://robachan.gumroad.com/l/1000-points-10?redirect_url=${encodeURIComponent(baseUrl + '?gumroad_success=1&product_id=points-2')}`,
+                3: `https://robachan.gumroad.com/l/5000-points-45?redirect_url=${encodeURIComponent(baseUrl + '?gumroad_success=1&product_id=points-3')}`,
+                4: `https://robachan.gumroad.com/l/10000-points-85?redirect_url=${encodeURIComponent(baseUrl + '?gumroad_success=1&product_id=points-4')}`,
+                5: `https://robachan.gumroad.com/l/25000-points-200?redirect_url=${encodeURIComponent(baseUrl + '?gumroad_success=1&product_id=points-5')}`
             };
             
             for (const pkg of packages) {

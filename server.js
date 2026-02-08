@@ -223,10 +223,43 @@ app.post('/api/boost/free', async (req, res) => {
 
 app.post('/api/gumroad-webhook', (req, res) => {
     try {
-        const { email, product_id, price } = req.body;
+        const { email, product_id, price, license_key } = req.body;
         console.log('Gumroad webhook:', { email, product_id, price });
-        res.json({ success: true });
+        
+        // Extract points from product_id (format: points-X where X is package id)
+        const match = product_id.match(/points-(\d+)/);
+        if (!match) {
+            return res.json({ success: false, message: 'Invalid product format' });
+        }
+        
+        const packageId = parseInt(match[1]);
+        const pointPackages = {
+            1: 100,
+            2: 1000,
+            3: 5000,
+            4: 10000,
+            5: 25000
+        };
+        
+        const points = pointPackages[packageId];
+        if (!points) {
+            return res.json({ success: false, message: 'Package not found' });
+        }
+        
+        // Store purchase record with email
+        const purchaseRecord = {
+            email,
+            product_id,
+            price,
+            points,
+            timestamp: Date.now(),
+            license_key
+        };
+        
+        console.log('Points added:', purchaseRecord);
+        res.json({ success: true, message: 'Payment processed', points });
     } catch (error) {
+        console.error('Webhook error:', error);
         res.status(500).json({ error: error.message });
     }
 });
