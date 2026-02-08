@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /.env
+Crawl-delay: 1
+
+Sitemap: https://zefoy-2.vercel.app/sitemap.xml
