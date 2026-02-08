@@ -21,17 +21,8 @@ app.use((req, res, next) => {
 const ZEFAME_API = 'https://zefame.com/api/v2';
 const API_KEY = 'a372c290e5a194628192507663f9cb64';
 
-// Service IDs (free services only)
-const SERVICES = {
-    instagram_followers: 220,
-    instagram_likes: 234,
-    instagram_views: 237,
-    instagram_comments: 231,
-    tiktok_followers: 352,
-    tiktok_likes: 351,
-    tiktok_views: 350,
-    tiktok_comments: 353
-};
+// Service IDs - will fetch from Zefame API
+let SERVICES = {};
 
 const cooldowns = new Map();
 const COOLDOWN = 30;
@@ -56,6 +47,46 @@ async function callZefameAPI(action, data) {
     } catch (error) {
         console.error('Zefame API Error:', error.message);
         throw error;
+    }
+}
+
+// Fetch available services from Zefame
+async function fetchServices() {
+    try {
+        const response = await callZefameAPI('services', {});
+        console.log('Available services:', response);
+        
+        if (Array.isArray(response)) {
+            response.forEach(service => {
+                const name = service.name.toLowerCase();
+                if (name.includes('instagram')) {
+                    if (name.includes('followers')) SERVICES.instagram_followers = service.service;
+                    if (name.includes('likes')) SERVICES.instagram_likes = service.service;
+                    if (name.includes('views')) SERVICES.instagram_views = service.service;
+                    if (name.includes('comments')) SERVICES.instagram_comments = service.service;
+                }
+                if (name.includes('tiktok')) {
+                    if (name.includes('followers')) SERVICES.tiktok_followers = service.service;
+                    if (name.includes('likes')) SERVICES.tiktok_likes = service.service;
+                    if (name.includes('views')) SERVICES.tiktok_views = service.service;
+                    if (name.includes('comments')) SERVICES.tiktok_comments = service.service;
+                }
+            });
+        }
+        console.log('Mapped services:', SERVICES);
+    } catch (error) {
+        console.error('Failed to fetch services:', error.message);
+        // Use fallback service IDs
+        SERVICES = {
+            instagram_followers: 220,
+            instagram_likes: 234,
+            instagram_views: 237,
+            instagram_comments: 231,
+            tiktok_followers: 352,
+            tiktok_likes: 351,
+            tiktok_views: 350,
+            tiktok_comments: 353
+        };
     }
 }
 
@@ -143,7 +174,11 @@ app.post('/api/boost', async (req, res) => {
         // Get service ID
         const serviceId = getServiceId(platform, type);
         if (!serviceId) {
-            return res.status(400).json({ msg: 'Service not available' });
+            console.log('Available services:', SERVICES);
+            return res.status(400).json({ 
+                msg: `Service not available: ${platform} ${type}`,
+                available: SERVICES
+            });
         }
 
         // Set cooldown
@@ -221,9 +256,13 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`✅ Server running on port ${PORT}`);
     console.log(`🌐 http://localhost:${PORT}`);
     console.log(`🔑 API Key: ${API_KEY.substring(0, 8)}...`);
     console.log(`⏱️ Cooldown: ${COOLDOWN}s per user`);
+    
+    // Fetch services on startup
+    console.log('Fetching available services from Zefame...');
+    await fetchServices();
 });
