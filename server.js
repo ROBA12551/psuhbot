@@ -453,25 +453,27 @@ app.get('/api/pricing', (req, res) => {
 // Add balance (payment)
 app.post('/api/payment/process', async (req, res) => {
     try {
-        const { amount, package_type } = req.body;
+        const { amount, method } = req.body;
         const userId = req.headers['x-user-id'] || crypto.randomBytes(16).toString('hex');
 
-        if (!payment.rates.packages[package_type]) {
-            return res.status(400).json({ error: 'Invalid package' });
+        if (!amount || amount < 1) {
+            return res.status(400).json({ error: 'Invalid amount' });
         }
 
-        const pkg = payment.rates.packages[package_type];
-        if (pkg.usd !== amount) {
-            return res.status(400).json({ error: 'Amount mismatch' });
-        }
+        // Calculate points (100 points per $1)
+        const points = Math.round(amount * 100);
 
-        const session = payment.createPaymentSession(userId, amount, package_type);
+        // Create payment session
+        const session = payment.createPaymentSession(userId, amount, method);
+        session.points = points;
+        session.method = method;
 
         res.json({
             paymentId: session.id,
             amount: session.amount,
-            points: pkg.points,
-            message: 'Payment session created'
+            points: points,
+            method: method,
+            message: 'Payment session created - Ready for checkout'
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -489,16 +491,17 @@ app.post('/api/payment/confirm', (req, res) => {
             return res.status(403).json({ error: 'Unauthorized' });
         }
 
-        const pkg = payment.rates.packages[session.package];
         const user = db.getUser(userId);
-        user.balance += pkg.points;
+        const points = session.points || Math.round(session.amount * 100);
+        user.balance += points;
 
         const transaction = {
             id: `TXN-${Date.now()}`,
             userId,
             type: 'purchase',
             amount: session.amount,
-            points: pkg.points,
+            points: points,
+            method: session.method || 'stripe',
             timestamp: Date.now()
         };
 
@@ -507,7 +510,8 @@ app.post('/api/payment/confirm', (req, res) => {
         res.json({
             success: true,
             balance: user.balance,
-            points: pkg.points
+            points: points,
+            message: 'Payment confirmed successfully'
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

@@ -1,9 +1,15 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zefoy 2 - Pro Growth</title>
+    <meta name="description" content="Zefoy - Free social media growth service">
+    <meta name="theme-color" content="#007bff">
+    <title>Zefoy 2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
         * {
             margin: 0;
@@ -12,384 +18,161 @@
         }
 
         body {
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #000;
-            color: #fff;
-            overflow-x: hidden;
-        }
-
-        .app {
-            display: grid;
-            grid-template-columns: 80px 1fr;
             min-height: 100vh;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            background: #121212;
-            border-right: 1px solid #2a2a2a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             padding: 20px 0;
-            position: sticky;
-            top: 0;
-            height: 100vh;
         }
 
-        .nav-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 10px 0;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s;
+        .navbar {
+            background: rgba(0, 0, 0, 0.95) !important;
+            border-bottom: 1px solid #333;
         }
 
-        .nav-icon:hover,
-        .nav-icon.active {
-            background: rgba(255, 0, 100, 0.2);
-            color: #ff006e;
-        }
-
-        /* Main Content */
-        .main {
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .title {
-            font-size: 32px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ff006e, #8338ec);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .balance-card {
-            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
-            border-radius: 12px;
-            padding: 15px 25px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .balance-card:hover {
-            transform: scale(1.05);
-        }
-
-        .balance-value {
+        .navbar-brand {
             font-size: 24px;
             font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .balance-label {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 0, 110, 0.4);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: #2a2a2a;
-            color: #fff;
-        }
-
-        .btn-secondary:hover {
-            background: #3a3a3a;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            border-bottom: 1px solid #2a2a2a;
-            overflow-x: auto;
-            padding-bottom: 15px;
-        }
-
-        .tab {
-            background: none;
-            border: none;
-            color: #999;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            padding: 10px 0;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-
-        .tab.active {
-            color: #ff006e;
-            border-bottom-color: #ff006e;
-        }
-
-        /* Grid */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
-            border: 1px solid #2a2a2a;
+        .container-main {
+            max-width: 1200px;
+            margin: 30px auto;
+            background: white;
             border-radius: 12px;
-            padding: 20px;
-            transition: all 0.3s;
-            cursor: pointer;
-            position: relative;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
 
-        .card:hover {
-            border-color: #ff006e;
-            box-shadow: 0 8px 24px rgba(255, 0, 110, 0.2);
-            transform: translateY(-4px);
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 600px;
         }
 
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #ff006e, #8338ec, transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .card:hover::before {
-            opacity: 1;
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .card-price {
-            font-size: 20px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ff006e, #8338ec);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
-        }
-
-        .card-limit {
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 15px;
-        }
-
-        .card-margin {
-            font-size: 11px;
-            color: #66ff00;
-            margin-bottom: 10px;
-        }
-
-        /* Form */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #ccc;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 12px;
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.3s;
-        }
-
-        input:focus,
-        select:focus {
-            outline: none;
-            border-color: #ff006e;
-            box-shadow: 0 0 10px rgba(255, 0, 110, 0.2);
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            align-items: center;
+        .left-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
         }
 
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
-            border: 1px solid #2a2a2a;
-            border-radius: 16px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-header {
-            font-size: 20px;
+        .logo {
+            font-size: 48px;
             font-weight: 800;
             margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
-        .close-btn {
+        .tagline {
+            font-size: 18px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .features {
+            list-style: none;
+        }
+
+        .features li {
+            margin: 10px 0;
+            font-size: 14px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .right-panel {
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-control {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .tabs-nav {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
             background: none;
             border: none;
+            padding: 15px 0;
+            font-size: 16px;
+            font-weight: 600;
             color: #999;
-            font-size: 24px;
             cursor: pointer;
-            transition: color 0.2s;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
         }
 
-        .close-btn:hover {
-            color: #fff;
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
         }
 
-        /* Messages */
-        .msg {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-            font-size: 14px;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .msg.success {
-            display: block;
-            background: rgba(102, 255, 0, 0.1);
-            color: #66ff00;
-            border: 1px solid rgba(102, 255, 0, 0.3);
-        }
-
-        .msg.error {
-            display: block;
-            background: rgba(255, 0, 110, 0.1);
-            color: #ff006e;
-            border: 1px solid rgba(255, 0, 110, 0.3);
-        }
-
-        .msg.loading {
-            display: block;
-            background: rgba(131, 56, 236, 0.1);
-            color: #8338ec;
-            border: 1px solid rgba(131, 56, 236, 0.3);
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border: 2px solid #8338ec;
-            border-top-color: transparent;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Content Sections */
-        .content {
+        .tab-content {
             display: none;
         }
 
-        .content.active {
+        .tab-content.active {
             display: block;
             animation: fadeIn 0.3s ease;
         }
@@ -403,37 +186,88 @@
             }
         }
 
-        .free-section {
-            background: linear-gradient(135deg, rgba(255, 0, 110, 0.1) 0%, rgba(131, 56, 236, 0.1) 100%);
-            border: 2px dashed #ff006e;
-            border-radius: 12px;
+        .card-service {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
             padding: 20px;
-            margin-bottom: 30px;
-            text-align: center;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
         }
 
-        .free-title {
-            font-size: 20px;
-            font-weight: 700;
+        .card-service:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .service-name {
+            font-weight: 600;
+            color: #333;
             margin-bottom: 8px;
         }
 
-        .free-desc {
-            font-size: 14px;
+        .service-price {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .service-limit {
+            font-size: 12px;
             color: #999;
+            margin-bottom: 10px;
+        }
+
+        .msg {
+            padding: 12px;
+            border-radius: 6px;
             margin-bottom: 15px;
+            display: none;
+            font-size: 14px;
         }
 
-        .package-grid {
+        .msg.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .msg.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .msg.loading {
+            display: block;
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .g-recaptcha {
+            margin: 20px 0;
+            transform: scale(0.95);
+            transform-origin: left;
+        }
+
+        .payment-methods {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
-            margin-bottom: 20px;
+            margin: 20px 0;
         }
 
-        .package-btn {
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
+        .payment-method {
+            background: white;
+            border: 2px solid #e0e0e0;
             border-radius: 8px;
             padding: 15px;
             text-align: center;
@@ -441,251 +275,322 @@
             transition: all 0.3s;
         }
 
-        .package-btn:hover {
-            border-color: #ff006e;
-            background: rgba(255, 0, 110, 0.1);
+        .payment-method:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
         }
 
-        .package-price {
-            font-size: 18px;
-            font-weight: 700;
-            color: #ff006e;
-            margin-bottom: 5px;
+        .payment-method.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
         }
 
-        .package-points {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #999;
+        .payment-icon {
+            font-size: 24px;
             margin-bottom: 8px;
         }
 
-        .stat-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #ff006e;
+        .payment-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .modal-dialog {
+            max-width: 500px;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .modal-header .close {
+            color: white;
+            opacity: 0.8;
+        }
+
+        .grid-services {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #667eea;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         @media (max-width: 768px) {
-            .app {
-                grid-template-columns: 60px 1fr;
+            .content-wrapper {
+                grid-template-columns: 1fr;
             }
 
-            .sidebar {
-                padding: 10px 0;
+            .left-panel {
+                display: none;
             }
 
-            .nav-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 18px;
+            .grid-services {
+                grid-template-columns: 1fr;
             }
 
-            .grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            .payment-methods {
+                grid-template-columns: 1fr;
             }
 
-            .main {
-                padding: 15px;
+            .tabs-nav {
+                flex-wrap: wrap;
+                gap: 10px;
             }
+        }
 
-            .title {
-                font-size: 24px;
-            }
+        footer {
+            background: rgba(0, 0, 0, 0.95);
+            color: #999;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            margin-top: 40px;
         }
     </style>
 </head>
 <body>
-    <div class="app">
-        <div class="sidebar">
-            <div class="nav-icon active" onclick="navigate('home')" title="Home">z</div>
-            <div class="nav-icon" onclick="navigate('instagram')" title="Instagram">📷</div>
-            <div class="nav-icon" onclick="navigate('tiktok')" title="TikTok">🎵</div>
-            <div class="nav-icon" onclick="navigate('twitter')" title="Twitter">𝕏</div>
-            <div class="nav-icon" onclick="navigate('profile')" title="Profile">👤</div>
+    <nav class="navbar navbar-dark">
+        <div class="navbar-brand">Zefoy 2</div>
+        <div style="color: white; font-size: 14px;">
+            Balance: <strong id="balance">0</strong> Points
         </div>
+    </nav>
 
-        <div class="main">
-            <div class="header">
-                <div class="title">Zefoy 2</div>
-                <div class="balance-card" onclick="showModal('payment')">
-                    <div>
-                        <div class="balance-label">Balance</div>
-                        <div class="balance-value" id="balance">0</div>
-                    </div>
-                </div>
+    <div class="container-main">
+        <div class="content-wrapper">
+            <div class="left-panel">
+                <div class="logo">Zefoy 2</div>
+                <div class="tagline">Free Social Media Growth Service</div>
+                <ul class="features">
+                    <li>Instant delivery</li>
+                    <li>No login required</li>
+                    <li>Safe & secure</li>
+                    <li>High quality engagement</li>
+                    <li>24/7 customer support</li>
+                </ul>
             </div>
 
-            <!-- Home -->
-            <div id="home" class="content active">
-                <div class="stats" id="stats">
-                    <div class="stat-card">
-                        <div class="stat-label">Orders</div>
-                        <div class="stat-value" id="orders">0</div>
+            <div class="right-panel">
+                <div id="auth-section">
+                    <h4 style="margin-bottom: 20px;">Get Started</h4>
+                    <div class="msg" id="msg"></div>
+
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="username" class="form-control" placeholder="Enter your username">
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Spent</div>
-                        <div class="stat-value" id="spent">0</div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email" class="form-control" placeholder="Enter your email">
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Status</div>
-                        <div class="stat-value" id="status">Ready</div>
-                    </div>
+
+                    <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+
+                    <button class="btn-login" onclick="authenticate()">Continue</button>
                 </div>
 
-                <div style="text-align: center; padding: 40px; color: #999;">
-                    <div style="font-size: 48px; margin-bottom: 20px;"></div>
-                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">Welcome to Zefoy 2</div>
-                    <div>Select a platform to get started</div>
-                </div>
-            </div>
-
-            <!-- Instagram -->
-            <div id="instagram" class="content">
-                <div class="msg" id="msg-ig"></div>
-
-                <div class="free-section">
-                    <div class="free-title">Free 10 Followers</div>
-                    <div class="free-desc">Claim every 12 hours</div>
-                    <input type="text" id="ig-free-url" placeholder="https://instagram.com/username" style="margin-bottom: 10px;">
-                    <button class="btn" onclick="claimFree('instagram')">Claim Now</button>
-                </div>
-
-                <div class="grid" id="ig-grid"></div>
-            </div>
-
-            <!-- TikTok -->
-            <div id="tiktok" class="content">
-                <div class="msg" id="msg-tk"></div>
-                <div class="grid" id="tk-grid"></div>
-            </div>
-
-            <!-- Twitter -->
-            <div id="twitter" class="content">
-                <div class="msg" id="msg-tw"></div>
-                <div class="grid" id="tw-grid"></div>
-            </div>
-
-            <!-- Profile -->
-            <div id="profile" class="content">
-                <div class="stats" style="margin-bottom: 30px;">
-                    <div class="stat-card">
-                        <div class="stat-label">Total Orders</div>
-                        <div class="stat-value" id="total-orders">0</div>
+                <div id="dashboard-section" style="display: none;">
+                    <div class="tabs-nav">
+                        <button class="tab-btn active" onclick="switchTab('instagram')">Instagram</button>
+                        <button class="tab-btn" onclick="switchTab('tiktok')">TikTok</button>
+                        <button class="tab-btn" onclick="switchTab('twitter')">Twitter</button>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Total Spent</div>
-                        <div class="stat-value" id="total-spent">0</div>
-                    </div>
-                </div>
 
-                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Premium Subscription</h2>
-                <div style="background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                    <div style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">1280 Points/Month</div>
-                    <div style="font-size: 14px; opacity: 0.9;">+10 followers every 30 minutes</div>
+                    <div id="instagram" class="tab-content active">
+                        <div class="msg" id="msg-ig"></div>
+                        <div class="grid-services" id="ig-services"></div>
+                    </div>
+
+                    <div id="tiktok" class="tab-content">
+                        <div class="msg" id="msg-tk"></div>
+                        <div class="grid-services" id="tk-services"></div>
+                    </div>
+
+                    <div id="twitter" class="tab-content">
+                        <div class="msg" id="msg-tw"></div>
+                        <div class="grid-services" id="tw-services"></div>
+                    </div>
+
+                    <button class="btn-login" onclick="logout()" style="background: #999; margin-top: 30px;">Logout</button>
                 </div>
-                <button class="btn" style="width: 100%;" onclick="subscribe()">Subscribe Now</button>
             </div>
         </div>
     </div>
 
     <!-- Payment Modal -->
-    <div id="payment" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div>Add Points</div>
-                <button class="close-btn" onclick="hideModal('payment')">&times;</button>
+    <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Select Payment Method</h5>
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="msg" id="payment-msg"></div>
+
+                    <div class="form-group">
+                        <label>Select Amount</label>
+                        <div class="payment-methods">
+                            <div class="payment-method" onclick="selectAmount('$10', 10, 1000)">
+                                <div class="payment-icon">10</div>
+                                <div class="payment-name">$10 - 1000 Points</div>
+                            </div>
+                            <div class="payment-method" onclick="selectAmount('$50', 50, 5000)">
+                                <div class="payment-icon">50</div>
+                                <div class="payment-name">$50 - 5000 Points</div>
+                            </div>
+                            <div class="payment-method" onclick="selectAmount('$100', 100, 10000)">
+                                <div class="payment-icon">100</div>
+                                <div class="payment-name">$100 - 10000 Points</div>
+                            </div>
+                            <div class="payment-method" onclick="selectAmount('$250', 250, 25000)">
+                                <div class="payment-icon">250</div>
+                                <div class="payment-name">$250 - 25000 Points</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="payment-details" style="display: none;">
+                        <label>Payment Method</label>
+                        <div class="payment-methods">
+                            <div class="payment-method selected" id="stripe-method" onclick="selectPaymentMethod('stripe')">
+                                <div class="payment-icon">Stripe</div>
+                                <div class="payment-name">Credit Card</div>
+                            </div>
+                            <div class="payment-method" id="paypal-method" onclick="selectPaymentMethod('paypal')">
+                                <div class="payment-icon">PayPal</div>
+                                <div class="payment-name">PayPal</div>
+                            </div>
+                        </div>
+
+                        <button class="btn-login" id="pay-btn" onclick="processPayment()">Pay Now</button>
+                    </div>
+                </div>
             </div>
-
-            <div class="msg" id="payment-msg"></div>
-
-            <div class="package-grid">
-                <div class="package-btn" onclick="buyPackage('small', 10, 1000)">
-                    <div class="package-price">$10</div>
-                    <div class="package-points">1000 pts</div>
-                </div>
-                <div class="package-btn" onclick="buyPackage('medium', 50, 5000)">
-                    <div class="package-price">$50</div>
-                    <div class="package-points">5000 pts</div>
-                </div>
-                <div class="package-btn" onclick="buyPackage('large', 100, 10000)">
-                    <div class="package-price">$100</div>
-                    <div class="package-points">10000 pts</div>
-                </div>
-                <div class="package-btn" onclick="buyPackage('xlarge', 250, 25000)">
-                    <div class="package-price">$250</div>
-                    <div class="package-points">25000 pts</div>
-                </div>
-            </div>
-
-            <div id="payment-details"></div>
         </div>
     </div>
 
-    <!-- Service Modal -->
-    <div id="service" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div id="service-title">Buy</div>
-                <button class="close-btn" onclick="hideModal('service')">&times;</button>
-            </div>
-
-            <div class="msg" id="service-msg"></div>
-
-            <div class="form-group">
-                <label>URL</label>
-                <input type="text" id="service-url" placeholder="https://...">
-            </div>
-
-            <div class="form-group">
-                <label>Quantity</label>
-                <input type="number" id="service-qty" min="1" value="100">
-                <div id="qty-info" style="font-size: 12px; color: #999; margin-top: 5px;"></div>
-            </div>
-
-            <div style="background: #1a1a1a; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span>Cost:</span>
-                    <span id="cost" style="font-weight: 700; color: #ff006e;">0</span>
+    <!-- Service Purchase Modal -->
+    <div class="modal fade" id="serviceModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="service-title">Buy Service</h5>
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <span>&times;</span>
+                    </button>
                 </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span>Balance:</span>
-                    <span id="modal-balance" style="font-weight: 700;">0</span>
+                <div class="modal-body">
+                    <div class="msg" id="service-msg"></div>
+
+                    <div class="form-group">
+                        <label>URL</label>
+                        <input type="text" id="service-url" class="form-control" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" id="service-qty" class="form-control" min="1" value="100">
+                    </div>
+
+                    <div style="background: #f0f4ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span>Cost:</span>
+                            <span id="service-cost" style="font-weight: 700;">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Balance:</span>
+                            <span id="service-balance" style="font-weight: 700;">0</span>
+                        </div>
+                    </div>
+
+                    <button class="btn-login" onclick="purchaseService()">Purchase Now</button>
                 </div>
             </div>
-
-            <button class="btn" style="width: 100%;" onclick="purchaseService()">Purchase Now</button>
         </div>
     </div>
+
+    <footer>
+        Zefoy 2 &copy; 2026 | Terms & Privacy | Contact: support@zefoy.com
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.3/js/bootstrap.min.js"></script>
 
     <script>
+        let userId = localStorage.getItem('userId');
         let currentService = null;
+        let selectedAmount = null;
+        let selectedPaymentMethod = 'stripe';
         let pricing = {};
-        let userId = localStorage.getItem('userId') || generateUserId();
 
-        function generateUserId() {
-            const id = 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-            localStorage.setItem('userId', id);
-            return id;
+        // Initialize
+        if (userId) {
+            showDashboard();
+            loadPricing();
+            loadUser();
+        }
+
+        async function authenticate() {
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+
+            if (!username || !email) {
+                showMsg('msg', 'Please fill all fields', 'error');
+                return;
+            }
+
+            // Check reCAPTCHA
+            const recaptchaToken = grecaptcha.getResponse();
+            if (!recaptchaToken) {
+                showMsg('msg', 'Please complete reCAPTCHA', 'error');
+                return;
+            }
+
+            userId = 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('userId', userId);
+            localStorage.setItem('username', username);
+            localStorage.setItem('email', email);
+
+            showMsg('msg', 'Authentication successful!', 'success');
+            setTimeout(() => {
+                showDashboard();
+                loadPricing();
+                loadUser();
+            }, 1000);
+        }
+
+        function showDashboard() {
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('dashboard-section').style.display = 'block';
+        }
+
+        function logout() {
+            localStorage.clear();
+            location.reload();
         }
 
         async function loadPricing() {
@@ -700,95 +605,58 @@
 
         function renderServices() {
             const platforms = { instagram: 'ig', tiktok: 'tk', twitter: 'tw' };
-            
+
             for (const [platform, prefix] of Object.entries(platforms)) {
-                const grid = document.getElementById(`${prefix}-grid`);
-                if (!grid) continue;
-                
-                grid.innerHTML = '';
+                const container = document.getElementById(`${prefix}-services`);
+                if (!container) continue;
+
+                container.innerHTML = '';
                 const services = pricing[platform] || {};
-                
+
                 for (const [key, svc] of Object.entries(services)) {
                     if (key.includes('free')) continue;
-                    
+
                     const card = document.createElement('div');
-                    card.className = 'card';
+                    card.className = 'card-service';
                     card.innerHTML = `
-                        <div class="card-title">${svc.name}</div>
-                        <div class="card-price">${(svc.price * 1000).toFixed(2)}</div>
-                        <div class="card-limit">Max: ${svc.limit.toLocaleString()}</div>
-                        <div class="card-margin">Margin: ${svc.margin}</div>
-                        <button class="btn" style="width: 100%;" onclick="selectService('${platform}', '${key}', '${svc.name}', ${svc.price}, ${svc.limit})">Buy</button>
+                        <div class="service-name">${svc.name}</div>
+                        <div class="service-price">${(svc.price * 1000).toFixed(2)}</div>
+                        <div class="service-limit">Max: ${svc.limit.toLocaleString()}</div>
+                        <button class="btn-login" style="margin-top: 10px; padding: 8px;" onclick="selectService('${platform}', '${key}', '${svc.name}', ${svc.price}, ${svc.limit})">Buy</button>
                     `;
-                    grid.appendChild(card);
+                    container.appendChild(card);
                 }
             }
-        }
-
-        async function loadUser() {
-            try {
-                const res = await fetch('/api/user/profile', {
-                    method: 'POST',
-                    headers: { 'x-user-id': userId }
-                });
-                const data = await res.json();
-                
-                document.getElementById('balance').textContent = data.balance;
-                document.getElementById('modal-balance').textContent = data.balance;
-                document.getElementById('orders').textContent = data.ordersCount;
-                document.getElementById('spent').textContent = data.spent;
-                document.getElementById('total-orders').textContent = data.ordersCount;
-                document.getElementById('total-spent').textContent = data.spent;
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        function navigate(page) {
-            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-icon').forEach(el => el.classList.remove('active'));
-            document.getElementById(page).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        function showModal(modal) {
-            document.getElementById(modal).classList.add('active');
-        }
-
-        function hideModal(modal) {
-            document.getElementById(modal).classList.remove('active');
         }
 
         function selectService(platform, service, name, price, limit) {
             currentService = { platform, service, name, price, limit };
             document.getElementById('service-title').textContent = `Buy ${name}`;
             document.getElementById('service-qty').max = limit;
-            document.getElementById('service-qty').value = Math.min(100, limit);
-            updateCost();
-            showModal('service');
+            $('#serviceModal').modal('show');
+            updateServiceCost();
         }
 
-        function updateCost() {
+        function updateServiceCost() {
             if (!currentService) return;
             const qty = parseInt(document.getElementById('service-qty').value) || 0;
             const cost = Math.ceil(qty * currentService.price * 100);
-            document.getElementById('cost').textContent = cost;
-            document.getElementById('qty-info').textContent = `Max: ${currentService.limit.toLocaleString()}`;
+            document.getElementById('service-cost').textContent = cost;
         }
 
-        document.getElementById('service-qty')?.addEventListener('input', updateCost);
+        document.getElementById('service-qty')?.addEventListener('input', updateServiceCost);
 
         async function purchaseService() {
             if (!currentService) return;
-            
+
             const url = document.getElementById('service-url').value;
             const qty = parseInt(document.getElementById('service-qty').value);
-            
+
             if (!url) {
                 showMsg('service-msg', 'Please enter URL', 'error');
                 return;
             }
-            
+
             try {
                 const res = await fetch('/api/boost/purchase', {
                     method: 'POST',
@@ -803,70 +671,45 @@
                         qty
                     })
                 });
-                
+
                 const data = await res.json();
-                
+
                 if (res.ok) {
-                    showMsg('service-msg', '✓ Order placed! ID: ' + data.orderId, 'success');
+                    showMsg('service-msg', 'Order placed: ' + data.orderId, 'success');
                     setTimeout(() => {
-                        hideModal('service');
+                        $('#serviceModal').modal('hide');
                         loadUser();
                     }, 1500);
                 } else {
-                    showMsg('service-msg', data.error || 'Failed', 'error');
+                    showMsg('service-msg', data.error, 'error');
                 }
             } catch (err) {
                 showMsg('service-msg', err.message, 'error');
             }
         }
 
-        async function claimFree(platform) {
-            const url = document.getElementById(`${platform === 'instagram' ? 'ig' : 'tk'}-free-url`).value;
-            if (!url) {
-                alert('Please enter URL');
+        function selectAmount(label, usd, points) {
+            selectedAmount = { usd, points };
+            document.getElementById('payment-details').style.display = 'block';
+            document.querySelectorAll('.payment-method').forEach((el, i) => {
+                if (i < 4) el.classList.remove('selected');
+            });
+            event.target.closest('.payment-method').classList.add('selected');
+        }
+
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            document.getElementById('stripe-method').classList.remove('selected');
+            document.getElementById('paypal-method').classList.remove('selected');
+            document.getElementById(`${method}-method`).classList.add('selected');
+        }
+
+        async function processPayment() {
+            if (!selectedAmount) {
+                showMsg('payment-msg', 'Please select amount', 'error');
                 return;
             }
-            
-            try {
-                const res = await fetch('/api/boost/free', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-user-id': userId
-                    },
-                    body: JSON.stringify({ url })
-                });
-                
-                const data = await res.json();
-                
-                if (res.ok) {
-                    alert('✓ ' + data.message);
-                    loadUser();
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            } catch (err) {
-                alert('Failed: ' + err.message);
-            }
-        }
 
-        function buyPackage(type, usd, points) {
-            document.getElementById('payment-details').innerHTML = `
-                <div style="background: #1a1a1a; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-                    <div style="margin-bottom: 10px;">
-                        <div style="font-size: 12px; color: #999;">Amount</div>
-                        <div style="font-size: 20px; font-weight: 700;">$${usd}</div>
-                    </div>
-                    <div>
-                        <div style="font-size: 12px; color: #999;">Points</div>
-                        <div style="font-size: 20px; font-weight: 700; color: #ff006e;">${points.toLocaleString()}</div>
-                    </div>
-                </div>
-                <button class="btn" style="width: 100%;" onclick="processPayment('${type}', ${usd}, ${points})">Proceed to Payment</button>
-            `;
-        }
-
-        async function processPayment(type, usd, points) {
             try {
                 const res = await fetch('/api/payment/process', {
                     method: 'POST',
@@ -875,15 +718,16 @@
                         'x-user-id': userId
                     },
                     body: JSON.stringify({
-                        amount: usd,
-                        package_type: type
+                        amount: selectedAmount.usd,
+                        package_type: selectedPaymentMethod,
+                        method: selectedPaymentMethod
                     })
                 });
-                
+
                 const data = await res.json();
-                
+
                 if (res.ok) {
-                    // Simulate payment confirmation
+                    // Simulate payment
                     setTimeout(async () => {
                         const confirm = await fetch('/api/payment/confirm', {
                             method: 'POST',
@@ -893,18 +737,17 @@
                             },
                             body: JSON.stringify({ paymentId: data.paymentId })
                         });
-                        
-                        const confirmData = await confirm.json();
+
                         if (confirm.ok) {
-                            showMsg('payment-msg', '✓ Payment successful!', 'success');
+                            showMsg('payment-msg', 'Payment successful!', 'success');
                             setTimeout(() => {
-                                hideModal('payment');
+                                $('#paymentModal').modal('hide');
                                 loadUser();
                             }, 1500);
                         }
                     }, 1000);
-                    
-                    showMsg('payment-msg', 'Processing...', 'loading');
+
+                    showMsg('payment-msg', '<span class="spinner"></span>Processing...', 'loading');
                 } else {
                     showMsg('payment-msg', data.error, 'error');
                 }
@@ -913,20 +756,36 @@
             }
         }
 
-        async function subscribe() {
-            alert('Subscription feature coming soon!');
+        async function loadUser() {
+            try {
+                const res = await fetch('/api/user/profile', {
+                    method: 'POST',
+                    headers: { 'x-user-id': userId }
+                });
+                const data = await res.json();
+                document.getElementById('balance').textContent = data.balance;
+                document.getElementById('service-balance').textContent = data.balance;
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
         }
 
         function showMsg(id, msg, type) {
             const el = document.getElementById(id);
-            el.textContent = msg;
+            el.innerHTML = msg;
             el.className = 'msg ' + type;
         }
 
-        // Initialize
-        loadPricing();
-        loadUser();
-        setInterval(loadUser, 30000);
+        function buyPoints() {
+            $('#paymentModal').modal('show');
+        }
     </script>
 </body>
 </html>
