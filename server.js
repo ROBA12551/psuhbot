@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const axios = require('axios');
-const crypto = require('crypto');
 require('dotenv').config();
 
 const app = express();
@@ -21,129 +20,58 @@ app.use((req, res, next) => {
 const ZEFAME_API = 'https://zefame.com/api/v2';
 const API_KEY = process.env.ZEFAME_API_KEY || '';
 
-// Service Database with Pricing
+// All Services with Complete Pricing
 const SERVICES = {
     instagram: {
-        followers_real: { 
-            id: 894, name: 'Real Followers', 
-            cost: 0.018, margin: 1.8, 
-            price_usd: 0.0324, price_jpy: 4.86,
-            limit: 1000
-        },
-        followers_temp: { 
-            id: 757, name: 'Temporary Followers', 
-            cost: 0.0078, margin: 1.8, 
-            price_usd: 0.0140, price_jpy: 2.10,
-            limit: 1000, free: true
-        },
-        likes: { 
-            id: 856, name: 'Likes', 
-            cost: 0.0052, margin: 2.0, 
-            price_usd: 0.0104, price_jpy: 1.56,
-            limit: 1000
-        },
-        views: { 
-            id: 'story', name: 'Story Views', 
-            cost: 0.0039, margin: 1.92, 
-            price_usd: 0.0075, price_jpy: 1.12,
-            limit: 1000
-        }
+        followers_real: { id: 894, name: 'Real Followers', cost: 1.80, margin: 1.8, limit: 1000 },
+        followers_temp: { id: 757, name: 'Temporary Followers', cost: 0.78, margin: 1.8, limit: 1000, free: true },
+        likes: { id: 856, name: 'Likes', cost: 0.52, margin: 2.0, limit: 10000 },
+        views: { id: 'story', name: 'Story Views', cost: 0.39, margin: 1.92, limit: 10000 }
     },
     tiktok: {
-        followers: { 
-            id: 708, name: 'Followers', 
-            cost: 0.0199, margin: 1.8, 
-            price_usd: 0.0358, price_jpy: 5.37,
-            limit: 1000
-        },
-        likes: { 
-            id: 988, name: 'Likes', 
-            cost: 0.0004, margin: 2.25, 
-            price_usd: 0.0009, price_jpy: 0.13,
-            limit: 1000
-        },
-        comments: { 
-            id: 694, name: 'Comments', 
-            cost: 0.0239, margin: 1.8, 
-            price_usd: 0.0430, price_jpy: 6.45,
-            limit: 1000
-        },
-        views_live: { 
-            id: 794, name: 'Live Views', 
-            cost: 0.0239, margin: 1.8, 
-            price_usd: 0.0430, price_jpy: 6.45,
-            limit: 1000
-        },
-        shares: { 
-            id: 786, name: 'Shares', 
-            cost: 0.0034, margin: 1.8, 
-            price_usd: 0.0061, price_jpy: 0.92,
-            limit: 1000
-        },
-        reposts: { 
-            id: 1039, name: 'Reposts', 
-            cost: 0.0335, margin: 1.8, 
-            price_usd: 0.0603, price_jpy: 9.04,
-            limit: 1000
-        }
+        followers: { id: 708, name: 'Followers', cost: 1.99, margin: 1.8, limit: 30000 },
+        likes: { id: 988, name: 'Likes', cost: 0.04, margin: 2.25, limit: 500000 },
+        comments: { id: 694, name: 'Comments', cost: 2.39, margin: 1.8, limit: 10000 },
+        views_live: { id: 794, name: 'Live Views', cost: 2.39, margin: 1.8, limit: 100000 },
+        shares: { id: 786, name: 'Shares', cost: 0.34, margin: 1.8, limit: 50000 },
+        reposts: { id: 1039, name: 'Reposts', cost: 3.35, margin: 1.8, limit: 50000 }
     },
     twitter: {
-        followers: { 
-            id: 781, name: 'Followers', 
-            cost: 0.0322, margin: 2.0, 
-            price_usd: 0.0644, price_jpy: 9.66,
-            limit: 1000
-        },
-        views: { 
-            id: 399, name: 'Tweet Views', 
-            cost: 0.0003, margin: 1.8, 
-            price_usd: 0.0005, price_jpy: 0.08,
-            limit: 1000
-        },
-        retweets: { 
-            id: 403, name: 'Retweets', 
-            cost: 0.0481, margin: 1.8, 
-            price_usd: 0.0866, price_jpy: 12.99,
-            limit: 1000
-        }
+        followers: { id: 781, name: 'Followers', cost: 3.22, margin: 2.0, limit: 10000 },
+        views: { id: 399, name: 'Tweet Views', cost: 0.03, margin: 1.8, limit: 100000 },
+        retweets: { id: 403, name: 'Retweets', cost: 4.81, margin: 1.8, limit: 5000 }
     }
 };
 
 // Point Packages
 const POINT_PACKAGES = [
-    { id: 1, name: '100 Points', points: 100, price_usd: 1, price_jpy: 150 },
-    { id: 2, name: '1000 Points', points: 1000, price_usd: 10, price_jpy: 1500 },
-    { id: 3, name: '5000 Points', points: 5000, price_usd: 45, price_jpy: 6750 },
-    { id: 4, name: '25000 Points', points: 25000, price_usd: 200, price_jpy: 30000 }
+    { id: 1, points: 100, price: 1 },
+    { id: 2, points: 1000, price: 10 },
+    { id: 3, points: 5000, price: 45 },
+    { id: 4, points: 10000, price: 85 },
+    { id: 5, points: 25000, price: 200 }
 ];
 
-// Security Manager
+// Subscription
+const SUBSCRIPTION = { price: 1280, interval: 30 * 60 * 1000, followers: 10 };
+
+// Security
 class SecurityManager {
     constructor() {
         this.patterns = {
             bot: /bot|crawler|spider|curl|wget|python|requests|selenium|puppeteer|mechanize|scrapy|httpx/i,
             vpn: /vpn|proxy|tor|vps|datacenter|aws|azure|digital.ocean|linode|vultr|virtual|hide|vpngate|expressvpn|nord|surfshark|cyberghost|hotspot/i,
-            adblock: /ad.*block|ublock|adguard|ghostery|disconnect|fair.ads|adawy|ubo/i,
-            root: /root|sudo|su|administrator|system32|program.files|etc\/passwd/i,
-            tools: /nmap|metasploit|burp|wireshark|charles|fiddler|zaproxy|owasp/i
+            adblock: /ad.*block|ublock|adguard|ghostery|disconnect/i,
+            root: /root|sudo|su|administrator|system32/i
         };
     }
     
     isBlocked(ua, ip) {
         const uaLower = (ua || '').toLowerCase();
-        const ipStr = String(ip || '').toLowerCase();
-        
-        for (const [type, pattern] of Object.entries(this.patterns)) {
-            if (pattern.test(uaLower) || pattern.test(ipStr)) {
-                console.log(`Blocked (${type}): ${ip}`);
-                return true;
-            }
+        for (const pattern of Object.values(this.patterns)) {
+            if (pattern.test(uaLower) || pattern.test(String(ip).toLowerCase())) return true;
         }
-        
-        if (/^127\.|^192\.168|^10\.|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[01]\./.test(ip)) {
-            return true;
-        }
-        
+        if (/^127\.|^192\.168|^10\.|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[01]\./.test(ip)) return true;
         return false;
     }
 }
@@ -153,123 +81,70 @@ class ZefameAPI {
         this.key = apiKey;
     }
     
-    async call(action, data = {}) {
+    async addOrder(serviceId, link, qty) {
         try {
-            const params = new URLSearchParams({ key: this.key, action, ...data });
-            const response = await axios.post(ZEFAME_API, params.toString(), {
+            const params = new URLSearchParams({ key: this.key, action: 'add', service: serviceId, link, quantity: qty });
+            const res = await axios.post(ZEFAME_API, params.toString(), {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 timeout: 15000
             });
-            return response.data;
+            return res.data;
         } catch (error) {
             console.error('Zefame Error:', error.message);
             throw error;
         }
     }
-    
-    async addOrder(serviceId, link, qty) {
-        return this.call('add', { service: serviceId, link, quantity: qty });
-    }
 }
 
 const security = new SecurityManager();
 const zefame = new ZefameAPI(API_KEY);
+const freeFollowerLog = new Map();
 
 // Routes
 
-// Root route
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Fallback for any non-API routes
-app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
-        res.sendFile(path.join(__dirname, 'index.html'));
-    } else {
-        res.status(404).json({ error: 'Not found' });
-    }
-});
-
-// Get Pricing
-app.get('/api/pricing', (req, res) => {
+app.get('/api/services', (req, res) => {
     try {
-        const pricing = {};
+        const data = {};
         for (const [platform, services] of Object.entries(SERVICES)) {
-            pricing[platform] = {};
+            data[platform] = {};
             for (const [key, svc] of Object.entries(services)) {
-                pricing[platform][key] = {
+                const pricePerUnit = svc.cost * svc.margin / 100;
+                data[platform][key] = {
                     name: svc.name,
-                    price_usd: svc.price_usd,
-                    price_jpy: svc.price_jpy,
+                    id: svc.id,
+                    price: pricePerUnit,
                     limit: svc.limit,
                     free: svc.free || false
                 };
             }
         }
-        res.json(pricing);
+        res.json(data);
     } catch (error) {
-        console.error('Pricing error:', error);
+        console.error('Services error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// Get Point Packages
 app.get('/api/points/packages', (req, res) => {
     try {
-        res.json({
-            packages: POINT_PACKAGES
-        });
+        res.json({ packages: POINT_PACKAGES });
     } catch (error) {
-        console.error('Packages error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// Calculate Point Cost
-app.post('/api/points/calculate', (req, res) => {
-    try {
-        const { platform, service, quantity } = req.body;
-        
-        if (!platform || !service || !quantity) {
-            return res.status(400).json({ error: 'Missing parameters' });
-        }
-        
-        const svc = SERVICES[platform]?.[service];
-        if (!svc) {
-            return res.status(400).json({ error: 'Service not found' });
-        }
-        
-        if (quantity > svc.limit || quantity < 10) {
-            return res.status(400).json({ error: `Quantity must be 10-${svc.limit}` });
-        }
-        
-        // Calculate points needed (based on USD price)
-        const points = Math.ceil(quantity * svc.price_usd * 100);
-        
-        res.json({
-            service: svc.name,
-            quantity,
-            points_needed: points,
-            price_usd: (points / 100).toFixed(2),
-            price_jpy: Math.ceil(points * 1.5)
-        });
-    } catch (error) {
-        console.error('Calculate error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Purchase Service (with points)
 app.post('/api/boost/purchase', async (req, res) => {
     try {
         const { platform, service, url, qty } = req.body;
         const ip = req.ip;
         const ua = req.headers['user-agent'] || '';
         
-        // Security checks
         if (security.isBlocked(ua, ip)) {
-            return res.status(403).json({ error: 'Access denied - VPN/Bot detected' });
+            return res.status(403).json({ error: 'Access denied' });
         }
         
         if (!platform || !service || !url || !qty) {
@@ -277,28 +152,20 @@ app.post('/api/boost/purchase', async (req, res) => {
         }
         
         const svc = SERVICES[platform]?.[service];
-        if (!svc) {
-            return res.status(400).json({ error: 'Service not found' });
-        }
-        
+        if (!svc) return res.status(400).json({ error: 'Service not found' });
         if (qty > svc.limit || qty < 10) {
             return res.status(400).json({ error: `Quantity must be 10-${svc.limit}` });
         }
         
-        // Add order to Zefame
         try {
             const result = await zefame.addOrder(svc.id, url, qty);
-            
             if (result.order) {
                 return res.json({
                     success: true,
                     orderId: result.order,
                     quantity: qty,
-                    service: svc.name,
-                    message: 'Order placed! Points will be deducted from your account.'
+                    service: svc.name
                 });
-            } else if (result.error) {
-                return res.status(400).json({ error: `Zefame: ${result.error}` });
             }
         } catch (error) {
             return res.status(500).json({ error: 'Order processing failed' });
@@ -309,29 +176,67 @@ app.post('/api/boost/purchase', async (req, res) => {
     }
 });
 
-// Gumroad Webhook
+app.post('/api/boost/free', async (req, res) => {
+    try {
+        const { url } = req.body;
+        const ip = req.ip;
+        const ua = req.headers['user-agent'] || '';
+        
+        if (security.isBlocked(ua, ip)) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+        
+        if (!url || !url.includes('instagram.com')) {
+            return res.status(400).json({ error: 'Invalid Instagram URL' });
+        }
+        
+        const lastClaim = freeFollowerLog.get(ip);
+        const now = Date.now();
+        const TWELVE_HOURS = 12 * 60 * 60 * 1000;
+        
+        if (lastClaim && (now - lastClaim) < TWELVE_HOURS) {
+            return res.status(429).json({
+                error: 'Wait before claiming again',
+                nextTime: new Date(lastClaim + TWELVE_HOURS).toISOString()
+            });
+        }
+        
+        try {
+            const result = await zefame.addOrder(757, url, 10);
+            if (result.order) {
+                freeFollowerLog.set(ip, now);
+                return res.json({ success: true, orderId: result.order });
+            }
+        } catch (error) {
+            return res.status(500).json({ error: 'Failed to add followers' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.post('/api/gumroad-webhook', (req, res) => {
     try {
-        const { email, product_id, price, license_key } = req.body;
-        console.log('Gumroad webhook received:', { email, product_id, price });
-        res.json({ success: true, message: 'Payment received' });
+        const { email, product_id, price } = req.body;
+        console.log('Gumroad webhook:', { email, product_id, price });
+        res.json({ success: true });
     } catch (error) {
-        console.error('Webhook error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// Health check
 app.get('/health', (req, res) => {
-    try {
-        res.json({ status: 'ok', time: new Date().toISOString() });
-    } catch (error) {
-        console.error('Health check error:', error);
-        res.status(500).json({ error: error.message });
+    res.json({ status: 'ok' });
+});
+
+app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+        res.sendFile(path.join(__dirname, 'index.html'));
+    } else {
+        res.status(404).json({ error: 'Not found' });
     }
 });
 
-// Error handler
 app.use((err, req, res, next) => {
     console.error('Server error:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -339,7 +244,4 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
     console.log(`✅ Zefoy 2 running on port ${PORT}`);
-    console.log(`🔒 Security: VPN/Bot/AdBlock/Root Detection Enabled`);
-    console.log(`💳 Payment: Gumroad Integration Ready`);
-    console.log(`📊 System: Points-based Purchase System`);
 });
