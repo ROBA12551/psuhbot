@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zefoy 2</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.3/css/bootstrap.min.css">
+    <title>Zefoy 2 Pro</title>
     <script src="https://gumroad.com/js/gumroad.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #333; }
         .navbar { background: white; border-bottom: 1px solid #e0e0e0; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .navbar-brand { font-size: 22px; font-weight: 700; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
+        .navbar-brand { font-size: 22px; font-weight: 700; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .navbar-right { display: flex; gap: 20px; align-items: center; }
+        .points-badge { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 10px 20px; border-radius: 20px; font-weight: 600; font-size: 13px; }
+        .btn-buy-points { background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 13px; }
+        .btn-buy-points:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4); }
         .container-main { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
         .section-title { font-size: 28px; font-weight: 700; margin-bottom: 30px; text-align: center; }
         .tabs { display: flex; gap: 15px; margin-bottom: 30px; border-bottom: 2px solid #e0e0e0; overflow-x: auto; }
@@ -18,44 +21,48 @@
         .tab.active { color: #667eea; border-bottom-color: #667eea; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .free-section { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); border: 2px solid #667eea; border-radius: 12px; padding: 25px; margin-bottom: 30px; text-align: center; }
-        .free-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-        .free-desc { font-size: 13px; color: #666; margin-bottom: 15px; }
-        .free-badge { display: inline-block; background: #667eea; color: white; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-bottom: 15px; }
         .url-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; margin-bottom: 10px; }
         .url-input:focus { outline: none; border-color: #667eea; }
         .btn { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 11px 22px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 13px; width: 100%; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4); }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .card { background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 20px; transition: all 0.3s; }
         .card:hover { border-color: #667eea; box-shadow: 0 6px 20px rgba(102, 126, 234, 0.12); transform: translateY(-3px); }
         .card-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
-        .card-price { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
-        .card-limit { font-size: 11px; color: #999; margin-bottom: 12px; }
-        .card-qty { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; margin-bottom: 10px; }
-        .gumroad-button { display: block; background: linear-gradient(135deg, #667eea, #764ba2) !important; color: white !important; padding: 10px 15px !important; border-radius: 6px !important; font-weight: 600 !important; text-align: center !important; text-decoration: none !important; margin: 8px 0 !important; font-size: 13px !important; }
-        .gumroad-button:hover { transform: translateY(-2px) !important; }
+        .card-price { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px; }
+        .card-qty-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; margin-bottom: 8px; }
+        .card-qty-info { font-size: 11px; color: #999; margin-bottom: 12px; }
+        .url-input-card { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; margin-bottom: 10px; }
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); z-index: 1000; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
-        .modal-content { background: white; border-radius: 12px; padding: 30px; max-width: 450px; width: 90%; }
+        .modal-content { background: white; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); }
         .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
         .timer { font-size: 48px; font-weight: 800; color: #667eea; text-align: center; margin: 20px 0; }
         .ad-box { background: #f0f0f0; height: 200px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+        .points-packages { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+        .package-box { background: white; border: 2px solid #e0e0e0; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .package-box:hover { border-color: #667eea; background: #f0f4ff; }
+        .package-price { font-size: 18px; font-weight: 700; color: #667eea; margin-bottom: 5px; }
+        .package-points { font-size: 12px; color: #666; }
+        .gumroad-button { display: block; background: linear-gradient(135deg, #667eea, #764ba2) !important; color: white !important; padding: 10px 15px !important; border-radius: 6px !important; font-weight: 600 !important; text-align: center !important; text-decoration: none !important; margin: 10px 0 !important; font-size: 12px !important; }
         .currency-toggle { display: flex; gap: 8px; margin-bottom: 20px; }
         .currency-btn { background: white; border: 1px solid #ddd; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s; }
         .currency-btn.active { background: #667eea; color: white; border-color: #667eea; }
-        .msg { padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; font-size: 12px; }
-        .msg.error { display: block; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .cost-info { background: #f0f4ff; padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 12px; }
+        .cost-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
         footer { background: white; border-top: 1px solid #e0e0e0; padding: 20px; text-align: center; font-size: 11px; color: #999; margin-top: 40px; }
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .tabs { flex-wrap: wrap; } }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .tabs { flex-wrap: wrap; } .navbar { flex-direction: column; gap: 15px; } }
     </style>
 </head>
 <body>
     <div class="navbar">
         <div class="navbar-brand">Zefoy 2</div>
-        <div style="color: #667eea; font-weight: 600; font-size: 13px;">No Login Required</div>
+        <div class="navbar-right">
+            <div class="points-badge">Points: <span id="points">0</span></div>
+            <button class="btn-buy-points" onclick="showPointsModal()">Buy Points</button>
+        </div>
     </div>
 
     <div class="container-main">
@@ -67,20 +74,8 @@
             <button class="tab" onclick="switchTab('twitter')">Twitter</button>
         </div>
 
+        <!-- Instagram -->
         <div id="instagram" class="tab-content active">
-            <div class="msg" id="msg-ig"></div>
-            
-            <div class="free-section">
-                <div class="free-badge">FREE - EVERY 12 HOURS</div>
-                <div class="free-title">Get 10 Free Followers</div>
-                <div class="free-desc">Watch a 30-second ad</div>
-                <input type="text" class="url-input" placeholder="https://instagram.com/username" id="ig-free-url">
-                <button class="btn" onclick="showAdModal('instagram')">Watch Ad & Claim</button>
-                <div style="font-size: 11px; color: #999; margin-top: 10px;">
-                    <span id="ig-timer"></span>
-                </div>
-            </div>
-
             <div class="currency-toggle">
                 <button class="currency-btn active" onclick="setCurrency('usd', this)">USD</button>
                 <button class="currency-btn" onclick="setCurrency('jpy', this)">JPY</button>
@@ -89,6 +84,7 @@
             <div class="grid" id="ig-grid"></div>
         </div>
 
+        <!-- TikTok -->
         <div id="tiktok" class="tab-content">
             <div class="currency-toggle">
                 <button class="currency-btn active" onclick="setCurrency('usd', this)">USD</button>
@@ -97,6 +93,7 @@
             <div class="grid" id="tk-grid"></div>
         </div>
 
+        <!-- Twitter -->
         <div id="twitter" class="tab-content">
             <div class="currency-toggle">
                 <button class="currency-btn active" onclick="setCurrency('usd', this)">USD</button>
@@ -106,37 +103,45 @@
         </div>
     </div>
 
-    <div class="modal" id="adModal">
+    <!-- Points Purchase Modal -->
+    <div class="modal" id="pointsModal">
         <div class="modal-content">
             <div class="modal-title">
-                Advertisement
+                Buy Points
                 <button class="close-btn" onclick="closeModal()">&times;</button>
             </div>
-            <div class="ad-box">
-                <div style="text-align: center;">
-                    <div style="font-size: 12px; color: #999; margin-bottom: 10px;">Ad Playing</div>
-                    <div class="timer" id="adTimer">30</div>
-                </div>
-            </div>
-            <button class="btn" id="claimBtn" disabled>Wait for ad... 30s</button>
+            <div class="points-packages" id="packagesGrid"></div>
         </div>
     </div>
 
     <footer>
-        Zefoy 2 - Free Social Media Growth | No Login | Watch Ads for Free Followers
+        Zefoy 2 - Free Social Media Growth | Points-Based System
     </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script>
         let currentCurrency = 'usd';
         let pricing = {};
+        let points = 0;
         const RATE = 150;
-        const FREE_INTERVAL = 12 * 60 * 60 * 1000;
 
-        // Load pricing on startup
+        // Initialize
+        loadFromStorage();
         loadPricing();
-        checkFreeTimer();
-        setInterval(checkFreeTimer, 60000);
+        loadPackages();
+        setInterval(saveToStorage, 30000);
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('zefoy_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                points = data.points || 0;
+                document.getElementById('points').textContent = points;
+            }
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('zefoy_data', JSON.stringify({ points }));
+        }
 
         async function loadPricing() {
             try {
@@ -145,6 +150,37 @@
                 renderServices();
             } catch (err) {
                 console.error('Failed to load pricing:', err);
+            }
+        }
+
+        async function loadPackages() {
+            try {
+                const res = await fetch('/api/points/packages');
+                const data = await res.json();
+                const grid = document.getElementById('packagesGrid');
+                
+                // Gumroad URLs - 正確なリンク
+                const gumroadUrls = {
+                    1: 'https://robachan.gumroad.com/l/100-point-1',
+                    2: 'https://robachan.gumroad.com/l/1000-points-10',
+                    3: 'https://robachan.gumroad.com/l/5000-points-45',
+                    4: 'https://robachan.gumroad.com/l/nmzgc'
+                };
+                
+                grid.innerHTML = '';
+                for (const pkg of data.packages) {
+                    const box = document.createElement('div');
+                    box.className = 'package-box';
+                    const url = gumroadUrls[pkg.id] || '#';
+                    box.innerHTML = `
+                        <div class="package-price">$${pkg.price_usd}</div>
+                        <div class="package-points">${pkg.points.toLocaleString()} Points</div>
+                        <a class="gumroad-button" href="${url}" target="_blank">Buy</a>
+                    `;
+                    grid.appendChild(box);
+                }
+            } catch (err) {
+                console.error('Failed to load packages:', err);
             }
         }
 
@@ -159,21 +195,92 @@
                 for (const [key, svc] of Object.entries(pricing[platform] || {})) {
                     if (svc.free) continue;
 
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    
                     const price = currentCurrency === 'usd' ? svc.price_usd : svc.price_jpy;
                     const symbol = currentCurrency === 'usd' ? '$' : '¥';
 
-                    const card = document.createElement('div');
-                    card.className = 'card';
                     card.innerHTML = `
                         <div class="card-title">${svc.name}</div>
                         <div class="card-price">${symbol}${parseFloat(price).toFixed(4)}</div>
-                        <div class="card-limit">Max: ${svc.limit.toLocaleString()}</div>
-                        <input type="number" class="card-qty" min="1" max="${svc.limit}" value="100" id="qty-${platform}-${key}">
-                        <input type="text" class="url-input" placeholder="https://..." id="url-${platform}-${key}">
-                        <a class="gumroad-button" href="https://gumroad.com/YOUR_USERNAME/p/${key}" target="_blank">Buy Now</a>
+                        
+                        <input type="number" class="card-qty-input" 
+                            id="qty-${platform}-${key}" 
+                            min="10" max="${svc.limit}" value="100"
+                            onchange="calculateCost('${platform}', '${key}')">
+                        <div class="card-qty-info" id="info-${platform}-${key}">10 - 1000</div>
+                        
+                        <div class="cost-info" id="cost-${platform}-${key}">
+                            <div class="cost-row">
+                                <span>Points Needed:</span>
+                                <span id="points-${platform}-${key}">-</span>
+                            </div>
+                        </div>
+
+                        <input type="text" class="url-input-card" 
+                            id="url-${platform}-${key}" 
+                            placeholder="https://...">
+                        <button class="btn" onclick="purchaseService('${platform}', '${key}')">Purchase</button>
                     `;
                     grid.appendChild(card);
                 }
+            }
+        }
+
+        function calculateCost(platform, service) {
+            const qty = parseInt(document.getElementById(`qty-${platform}-${service}`).value);
+            const svc = pricing[platform]?.[service];
+            
+            if (!qty || qty < 10 || qty > svc.limit) {
+                return;
+            }
+
+            const points_needed = Math.ceil(qty * svc.price_usd * 100);
+            document.getElementById(`points-${platform}-${service}`).textContent = points_needed;
+        }
+
+        async function purchaseService(platform, service) {
+            const qty = parseInt(document.getElementById(`qty-${platform}-${service}`).value);
+            const url = document.getElementById(`url-${platform}-${service}`).value;
+            const svc = pricing[platform]?.[service];
+
+            if (!url) {
+                alert('Please enter your profile URL');
+                return;
+            }
+
+            if (qty < 10 || qty > svc.limit) {
+                alert(`Quantity must be between 10 and ${svc.limit}`);
+                return;
+            }
+
+            const points_needed = Math.ceil(qty * svc.price_usd * 100);
+            
+            if (points < points_needed) {
+                alert(`Insufficient points. You need ${points_needed} points but have ${points}`);
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/boost/purchase', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ platform, service, url, qty })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    points -= points_needed;
+                    document.getElementById('points').textContent = points;
+                    saveToStorage();
+                    alert('✓ Order placed! Check your account for updates.');
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Error: ' + err.message);
             }
         }
 
@@ -191,91 +298,12 @@
             renderServices();
         }
 
-        function showAdModal(platform) {
-            const url = document.getElementById(`${platform}-free-url`).value;
-            if (!url) {
-                alert('Please enter your profile URL');
-                return;
-            }
-
-            sessionStorage.setItem('adUrl', url);
-            sessionStorage.setItem('adPlatform', platform);
-            document.getElementById('adModal').classList.add('active');
-            startAdTimer();
-        }
-
-        function startAdTimer() {
-            let seconds = 30;
-            const timer = document.getElementById('adTimer');
-            const btn = document.getElementById('claimBtn');
-
-            timer.textContent = seconds;
-
-            const interval = setInterval(() => {
-                seconds--;
-                timer.textContent = seconds;
-                btn.textContent = `Wait for ad... ${seconds}s`;
-
-                if (seconds <= 0) {
-                    clearInterval(interval);
-                    btn.disabled = false;
-                    btn.textContent = 'Claim Free Followers';
-                }
-            }, 1000);
+        function showPointsModal() {
+            document.getElementById('pointsModal').classList.add('active');
         }
 
         function closeModal() {
-            document.getElementById('adModal').classList.remove('active');
-            document.getElementById('claimBtn').disabled = true;
-            document.getElementById('claimBtn').textContent = 'Wait for ad... 30s';
-        }
-
-        document.getElementById('claimBtn').addEventListener('click', async function() {
-            const url = sessionStorage.getItem('adUrl');
-            const platform = sessionStorage.getItem('adPlatform');
-
-            try {
-                const res = await fetch('/api/boost/free', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url })
-                });
-
-                const data = await res.json();
-
-                if (res.ok) {
-                    alert('✓ 10 free followers claimed!');
-                    localStorage.setItem(`lastFree_${platform}`, Date.now());
-                    closeModal();
-                    checkFreeTimer();
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            } catch (err) {
-                alert('Error: ' + err.message);
-            }
-        });
-
-        function checkFreeTimer() {
-            const lastFree = localStorage.getItem('lastFree_instagram');
-            const el = document.getElementById('ig-timer');
-
-            if (!lastFree) {
-                el.textContent = 'Available now';
-                return;
-            }
-
-            const elapsed = Date.now() - parseInt(lastFree);
-            const remaining = FREE_INTERVAL - elapsed;
-
-            if (remaining <= 0) {
-                el.textContent = 'Available now';
-                localStorage.removeItem('lastFree_instagram');
-            } else {
-                const hours = Math.floor(remaining / 3600000);
-                const minutes = Math.floor((remaining % 3600000) / 60000);
-                el.textContent = `Available in ${hours}h ${minutes}m`;
-            }
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
         }
     </script>
 </body>
