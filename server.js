@@ -109,6 +109,14 @@ const SERVICES = {
     }
 };
 
+// Point Packages
+const POINT_PACKAGES = [
+    { id: 1, name: '100 Points', points: 100, price_usd: 1, price_jpy: 150 },
+    { id: 2, name: '1000 Points', points: 1000, price_usd: 10, price_jpy: 1500 },
+    { id: 3, name: '5000 Points', points: 5000, price_usd: 45, price_jpy: 6750 },
+    { id: 4, name: '25000 Points', points: 25000, price_usd: 200, price_jpy: 30000 }
+];
+
 // Security Manager
 class SecurityManager {
     constructor() {
@@ -171,32 +179,37 @@ const zefame = new ZefameAPI(API_KEY);
 
 // Get Pricing
 app.get('/api/pricing', (req, res) => {
-    const pricing = {};
-    for (const [platform, services] of Object.entries(SERVICES)) {
-        pricing[platform] = {};
-        for (const [key, svc] of Object.entries(services)) {
-            pricing[platform][key] = {
-                name: svc.name,
-                price_usd: svc.price_usd,
-                price_jpy: svc.price_jpy,
-                limit: svc.limit,
-                free: svc.free || false
-            };
+    try {
+        const pricing = {};
+        for (const [platform, services] of Object.entries(SERVICES)) {
+            pricing[platform] = {};
+            for (const [key, svc] of Object.entries(services)) {
+                pricing[platform][key] = {
+                    name: svc.name,
+                    price_usd: svc.price_usd,
+                    price_jpy: svc.price_jpy,
+                    limit: svc.limit,
+                    free: svc.free || false
+                };
+            }
         }
+        res.json(pricing);
+    } catch (error) {
+        console.error('Pricing error:', error);
+        res.status(500).json({ error: error.message });
     }
-    res.json(pricing);
 });
 
 // Get Point Packages
 app.get('/api/points/packages', (req, res) => {
-    res.json({
-        packages: [
-            { id: 1, name: '1000 Points', points: 1000, price_usd: 10, price_jpy: 1500 },
-            { id: 2, name: '5000 Points', points: 5000, price_usd: 45, price_jpy: 6750 },
-            { id: 3, name: '10000 Points', points: 10000, price_usd: 85, price_jpy: 12750 },
-            { id: 4, name: '25000 Points', points: 25000, price_usd: 200, price_jpy: 30000 }
-        ]
-    });
+    try {
+        res.json({
+            packages: POINT_PACKAGES
+        });
+    } catch (error) {
+        console.error('Packages error:', error);
+        res.status(500).json({ error: error.message });
+    }
 });
 
 // Calculate Point Cost
@@ -228,6 +241,7 @@ app.post('/api/points/calculate', (req, res) => {
             price_jpy: Math.ceil(points * 1.5)
         });
     } catch (error) {
+        console.error('Calculate error:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -276,13 +290,9 @@ app.post('/api/boost/purchase', async (req, res) => {
             return res.status(500).json({ error: 'Order processing failed' });
         }
     } catch (error) {
+        console.error('Purchase error:', error);
         res.status(500).json({ error: error.message });
     }
-});
-
-// Health check
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
 // Gumroad Webhook
@@ -295,6 +305,22 @@ app.post('/api/gumroad-webhook', (req, res) => {
         console.error('Webhook error:', error);
         res.status(500).json({ error: error.message });
     }
+});
+
+// Health check
+app.get('/health', (req, res) => {
+    try {
+        res.json({ status: 'ok', time: new Date().toISOString() });
+    } catch (error) {
+        console.error('Health check error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+    console.error('Server error:', err);
+    res.status(500).json({ error: 'Internal server error' });
 });
 
 app.listen(PORT, () => {
