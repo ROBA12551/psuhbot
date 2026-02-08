@@ -153,8 +153,11 @@ app.post('/api/boost/purchase', async (req, res) => {
         
         const svc = SERVICES[platform]?.[service];
         if (!svc) return res.status(400).json({ error: 'Service not found' });
-        if (qty > svc.limit || qty < 10) {
-            return res.status(400).json({ error: `Quantity must be 10-${svc.limit}` });
+        if (qty > 1000 || qty < 10) {
+            return res.status(400).json({ error: `Quantity must be 10-1000 (service max: ${svc.limit})` });
+        }
+        if (qty > svc.limit) {
+            return res.status(400).json({ error: `Service max: ${svc.limit}` });
         }
         
         try {
@@ -190,14 +193,17 @@ app.post('/api/boost/free', async (req, res) => {
             return res.status(400).json({ error: 'Invalid Instagram URL' });
         }
         
+        // IP-based rate limiting (12 hours)
         const lastClaim = freeFollowerLog.get(ip);
         const now = Date.now();
         const TWELVE_HOURS = 12 * 60 * 60 * 1000;
         
         if (lastClaim && (now - lastClaim) < TWELVE_HOURS) {
+            const nextTime = new Date(lastClaim + TWELVE_HOURS);
             return res.status(429).json({
                 error: 'Wait before claiming again',
-                nextTime: new Date(lastClaim + TWELVE_HOURS).toISOString()
+                nextTime: nextTime.toISOString(),
+                remainingMs: (lastClaim + TWELVE_HOURS) - now
             });
         }
         
