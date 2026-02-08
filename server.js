@@ -6,145 +6,111 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
+
+// CORS headers
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(200);
-    }
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    if (req.method === 'OPTIONS') return res.sendStatus(200);
     next();
 });
 
-const cooldowns = {};
-const stats = new Map();
+const ZEFAME_API = 'https://zefame.com/api/v2';
+const API_KEY = 'a372c290e5a194628192507663f9cb64';
+
+// Service IDs (free services only)
+const SERVICES = {
+    instagram_followers: 220,
+    instagram_likes: 234,
+    instagram_views: 237,
+    instagram_comments: 231,
+    tiktok_followers: 352,
+    tiktok_likes: 351,
+    tiktok_views: 350,
+    tiktok_comments: 353
+};
+
+const cooldowns = new Map();
 const COOLDOWN = 30;
 
-// Real Zefame API - Instagram
-async function boostInstagram(url, type, qty) {
+// Call Zefame API
+async function callZefameAPI(action, data) {
     try {
-        // Real Zefame API call
-        const serviceMap = {
-            followers: 220,
-            likes: 234,
-            views: 237,
-            comments: 231
-        };
+        const params = new URLSearchParams({
+            key: API_KEY,
+            action: action,
+            ...data
+        });
 
-        // Try real API first
-        try {
-            const response = await axios.post('https://zefame.com/api/v2/order', {
-                service: serviceMap[type],
-                link: url,
-                quantity: qty
-            }, {
-                headers: {
-                    'Accept': 'application/json'
-                },
-                timeout: 8000
-            });
+        const response = await axios.post(ZEFAME_API, params.toString(), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            timeout: 10000
+        });
 
-            if (response.data && response.data.order) {
-                const orderId = `ORD-${response.data.order}`;
-                recordStats(url, type, qty);
-                return { success: true, id: orderId, api: 'Zefame' };
-            }
-        } catch (apiError) {
-            console.log('Zefame API failed, using fallback');
-        }
-
-        // Fallback - simulate boost
-        const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        recordStats(url, type, qty);
-        return { success: true, id: orderId, api: 'Fallback' };
-    } catch (e) {
-        return { success: false, error: e.message };
+        return response.data;
+    } catch (error) {
+        console.error('Zefame API Error:', error.message);
+        throw error;
     }
 }
 
-// Real SocialBoost API - TikTok
-async function boostTikTok(url, type, qty) {
+// Add order to Zefame
+async function addOrder(serviceId, link, quantity) {
     try {
-        const serviceMap = {
-            followers: 352,
-            likes: 351,
-            views: 350,
-            comments: 353
-        };
+        const response = await callZefameAPI('add', {
+            service: serviceId,
+            link: link,
+            quantity: quantity
+        });
 
-        try {
-            const response = await axios.post('https://api.socialboost.io/v1/order', {
-                service: serviceMap[type],
-                link: url,
-                quantity: qty
-            }, {
-                headers: {
-                    'Accept': 'application/json'
-                },
-                timeout: 8000
-            });
-
-            if (response.data && response.data.order) {
-                const orderId = `ORD-${response.data.order}`;
-                recordStats(url, type, qty);
-                return { success: true, id: orderId, api: 'SocialBoost' };
-            }
-        } catch (apiError) {
-            console.log('SocialBoost API failed, using fallback');
-        }
-
-        const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        recordStats(url, type, qty);
-        return { success: true, id: orderId, api: 'Fallback' };
-    } catch (e) {
-        return { success: false, error: e.message };
+        return response;
+    } catch (error) {
+        throw error;
     }
 }
 
-// Record statistics
-function recordStats(url, type, qty) {
-    if (!stats.has(url)) {
-        stats.set(url, { followers: 0, likes: 0, views: 0, comments: 0 });
+// Get service ID
+function getServiceId(platform, type) {
+    const key = `${platform}_${type}`;
+    return SERVICES[key];
+}
+
+// Validate URL
+function validateUrl(url, platform) {
+    if (platform === 'instagram') {
+        return /(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel|stories|[\w\.]+)/i.test(url);
+    } else {
+        return /(?:https?:\/\/)?(?:www\.)?tiktok\.com\/@[\w\.-]+/i.test(url);
     }
-    const data = stats.get(url);
-    data[type] = (data[type] || 0) + qty;
 }
 
-// Check cooldown per IP
-function checkCooldown(ip) {
-    if (!cooldowns[ip]) return false;
-    if (Date.now() - cooldowns[ip] < COOLDOWN * 1000) return true;
-    return false;
+// Check cooldown
+function getCooldownRemaining(identifier) {
+    if (!cooldowns.has(identifier)) return 0;
+    const elapsed = Date.now() - cooldowns.get(identifier);
+    const remaining = Math.max(0, COOLDOWN * 1000 - elapsed);
+    return Math.ceil(remaining / 1000);
 }
 
-function setCooldown(ip) {
-    cooldowns[ip] = Date.now();
-}
-
-// Validate Instagram URL
-function validateInstagram(url) {
-    return /(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:p|reel|stories)\/[\w-]+/i.test(url) ||
-           /(?:https?:\/\/)?(?:www\.)?instagram\.com\/[\w\.]+\/?/i.test(url);
-}
-
-// Validate TikTok URL
-function validateTikTok(url) {
-    return /(?:https?:\/\/)?(?:www\.)?tiktok\.com\/@[\w\.-]+\/video\/\d+/i.test(url) ||
-           /(?:https?:\/\/)?(?:www\.)?tiktok\.com\/@[\w\.-]+\/?/i.test(url);
+// Set cooldown
+function setCooldown(identifier) {
+    cooldowns.set(identifier, Date.now());
 }
 
 // Routes
 app.post('/api/boost', async (req, res) => {
     try {
         const { platform, url, type, qty } = req.body;
-        const ip = req.ip || req.connection.remoteAddress || 'unknown';
+        const clientId = req.headers['x-client-id'] || req.ip;
 
-        // Validate
+        // Validate input
         if (!platform || !url || !type || !qty) {
-            return res.status(400).json({ msg: 'Missing required fields' });
+            return res.status(400).json({ msg: 'Missing fields' });
         }
 
         if (!['instagram', 'tiktok'].includes(platform)) {
@@ -156,74 +122,104 @@ app.post('/api/boost', async (req, res) => {
         }
 
         if (qty < 1 || qty > 10000) {
-            return res.status(400).json({ msg: 'Quantity must be 1-10000' });
+            return res.status(400).json({ msg: 'Quantity 1-10000' });
         }
 
-        // URL validation
-        if (platform === 'instagram') {
-            if (!validateInstagram(url)) {
-                return res.status(400).json({ msg: 'Invalid Instagram URL' });
-            }
-        } else {
-            if (!validateTikTok(url)) {
-                return res.status(400).json({ msg: 'Invalid TikTok URL' });
-            }
+        // Validate URL
+        if (!validateUrl(url, platform)) {
+            return res.status(400).json({ msg: 'Invalid URL format' });
         }
 
-        // Cooldown check per account
-        if (checkCooldown(ip)) {
-            const remaining = Math.ceil((COOLDOWN * 1000 - (Date.now() - cooldowns[ip])) / 1000);
-            return res.status(429).json({ msg: `Wait ${remaining}s before next boost` });
+        // Check cooldown
+        const remaining = getCooldownRemaining(clientId);
+        if (remaining > 0) {
+            return res.status(429).json({ msg: `Wait ${remaining}s`, remaining });
         }
 
-        setCooldown(ip);
-
-        // Process boost
-        let result;
-        if (platform === 'instagram') {
-            result = await boostInstagram(url, type, qty);
-        } else {
-            result = await boostTikTok(url, type, qty);
+        // Get service ID
+        const serviceId = getServiceId(platform, type);
+        if (!serviceId) {
+            return res.status(400).json({ msg: 'Service not available' });
         }
 
-        if (result.success) {
+        // Set cooldown
+        setCooldown(clientId);
+
+        // Send to Zefame API
+        console.log(`Processing: ${platform} ${type} x${qty} to ${url}`);
+        const result = await addOrder(serviceId, url, qty);
+
+        console.log('Zefame Response:', result);
+
+        // Check if successful
+        if (result.order) {
             return res.json({
-                id: result.id,
+                id: result.order,
+                status: 'success',
+                platform,
+                type,
+                qty,
+                message: 'Order placed successfully on Zefame'
+            });
+        } else if (result.error) {
+            return res.status(400).json({ msg: `Zefame: ${result.error}` });
+        } else {
+            return res.json({
+                id: `ORD-${Date.now()}`,
                 status: 'processing',
                 platform,
                 type,
                 qty,
-                message: 'Boost started successfully'
+                message: 'Order processing'
             });
-        } else {
-            return res.status(500).json({ msg: 'Boost failed: ' + result.error });
         }
-    } catch (e) {
-        console.error('Error:', e);
-        return res.status(500).json({ msg: 'Server error' });
+
+    } catch (error) {
+        console.error('Error:', error.message);
+        return res.status(500).json({ 
+            msg: error.message || 'Server error'
+        });
     }
 });
 
-// Get stats
-app.get('/api/stats/:url', (req, res) => {
-    const url = decodeURIComponent(req.params.url);
-    const data = stats.get(url) || { followers: 0, likes: 0, views: 0, comments: 0 };
-    res.json(data);
+// Check order status
+app.get('/api/status/:orderId', async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        
+        const response = await callZefameAPI('status', {
+            order: orderId
+        });
+
+        res.json(response);
+    } catch (error) {
+        res.status(500).json({ msg: 'Failed to get status' });
+    }
+});
+
+// Get balance
+app.get('/api/balance', async (req, res) => {
+    try {
+        const response = await callZefameAPI('balance', {});
+        res.json(response);
+    } catch (error) {
+        res.status(500).json({ msg: 'Failed to get balance' });
+    }
 });
 
 // Health check
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', uptime: process.uptime() });
+    res.json({ status: 'ok', api: 'Zefame' });
 });
 
-// 404 fallback to index.html
+// Serve index.html for all other routes
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Start server
 app.listen(PORT, () => {
     console.log(`✅ Server running on port ${PORT}`);
-    console.log(`🌐 Open http://localhost:${PORT}`);
+    console.log(`🌐 http://localhost:${PORT}`);
+    console.log(`🔑 API Key: ${API_KEY.substring(0, 8)}...`);
     console.log(`⏱️ Cooldown: ${COOLDOWN}s per user`);
 });
